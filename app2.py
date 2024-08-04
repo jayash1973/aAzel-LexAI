@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from requests.exceptions import RequestException, ConnectionError, Timeout
 from ai71 import AI71
 import PyPDF2
 import io
@@ -18,7 +21,6 @@ import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup, NavigableString, Tag
 from io import StringIO
 import wikipedia
-from googleapiclient.discovery import build
 from typing import List, Optional
 from httpx_sse import SSEError
 from difflib import SequenceMatcher
@@ -26,6 +28,8 @@ from datetime import datetime
 import spacy
 import time
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,7 +48,7 @@ except ImportError:
     st.stop()
 
 # Constants
-AI71_API_KEY = "enter your falcon api key"
+AI71_API_KEY = "your AI71 falcon api key here"
 
 # Initialize AI71 client
 try:
@@ -77,7 +81,7 @@ def analyze_uploaded_document(file):
 
 def get_document_based_response(prompt, document_content):
     messages = [
-        {"role": "system", "content": "You are a helpful legal assistant. Answer questions based on the provided document content."},
+        {"role": "system", "content": "You are a helpful legal assistant LexAI which has all the legal information in the world and is the the best assitand for lawyers, lawfirms and a common citizen. Answer questions based on the provided document content."},
         {"role": "user", "content": f"Document content: {document_content}\n\nQuestion: {prompt}"}
     ]
     try:
@@ -293,47 +297,167 @@ def extract_important_info(text: str) -> str:
     prompt = f"Extract and highlight the most important legal information from the following text. Use markdown to emphasize key points:\n\n{text}"
     return get_ai_response(prompt)
 
-def fetch_detailed_content(url: str) -> str:
+user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36'
+]
+
+# Rate limiting parameters
+MIN_DELAY = 3  # Minimum delay between requests in seconds
+MAX_DELAY = 10  # Maximum delay between requests in seconds
+last_request_time = 0
+
+def get_random_user_agent():
+    return random.choice(user_agents)
+
+def rate_limit():
+    global last_request_time
+    current_time = time.time()
+    time_since_last_request = current_time - last_request_time
+    if time_since_last_request < MIN_DELAY:
+        sleep_time = random.uniform(MIN_DELAY, MAX_DELAY)
+        time.sleep(sleep_time)
+    last_request_time = time.time()
+
+def fetch_detailed_content(url):
+    rate_limit()
+    
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument(f"user-agent={get_random_user_agent()}")
+
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Extract main content (this may need to be adjusted based on the structure of the target websites)
-        main_content = soup.find('main') or soup.find('article') or soup.find('div', class_='content')
-        
-        if main_content:
-            # Extract text from paragraphs
-            paragraphs = main_content.find_all('p')
-            content = "\n\n".join([p.get_text() for p in paragraphs])
+        # Use webdriver_manager to handle driver installation
+        service = Service(ChromeDriverManager().install())
+        with webdriver.Chrome(service=service, options=chrome_options) as driver:
+            driver.get(url)
             
-            # Limit content to a reasonable length (e.g., first 1000 characters)
-            return content[:1000] + "..." if len(content) > 1000 else content
-        else:
-            return "Unable to extract detailed content from the webpage."
+            # Wait for the main content to load
+            WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.TAG_NAME, "body"))
+            )
+
+            # Scroll to load any lazy-loaded content
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)  # Wait for any dynamic content to load
+
+            # Get the page source after JavaScript execution
+            page_source = driver.page_source
+
+            # Use BeautifulSoup for parsing
+            soup = BeautifulSoup(page_source, 'html.parser')
+
+            # Remove script and style elements
+            for script in soup(["script", "style"]):
+                script.decompose()
+
+            # Extract main content (customize based on the website structure)
+            main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile('content|main'))
+
+            if not main_content:
+                main_content = soup.body
+
+            # Extract text content
+            text_content = main_content.get_text(separator='\n', strip=True)
+
+            # Clean and process the content
+            cleaned_content = clean_content(text_content)
+
+            return cleaned_content
+
     except Exception as e:
-        return f"Error fetching detailed content: {str(e)}"
+        print(f"Error fetching content: {e}")
+        return f"Unable to fetch detailed content. Error: {str(e)}", {}
+
+def clean_content(text):
+    # Remove extra whitespace and newlines
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    # Remove any remaining HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    
+    # Remove special characters and digits (customize as needed)
+    text = re.sub(r'[^a-zA-Z\s.,;:?!-]', '', text)
+    
+    # Split into sentences
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    
+    # Remove short sentences (likely to be noise)
+    sentences = [s for s in sentences if len(s.split()) > 3]
+    
+    # Join sentences back together
+    cleaned_text = ' '.join(sentences)
+    
+    return cleaned_text
+
+def extract_structured_data(soup):
+    structured_data = {}
+
+    # Extract title
+    title = soup.find('title')
+    if title:
+        structured_data['title'] = title.get_text(strip=True)
+
+    # Extract meta description
+    meta_desc = soup.find('meta', attrs={'name': 'description'})
+    if meta_desc:
+        structured_data['description'] = meta_desc.get('content', '')
+
+    # Extract headings
+    headings = []
+    for tag in ['h1', 'h2', 'h3']:
+        for heading in soup.find_all(tag):
+            headings.append({
+                'level': tag,
+                'text': heading.get_text(strip=True)
+            })
+    structured_data['headings'] = headings
+
+    # Extract links
+    links = []
+    for link in soup.find_all('a', href=True):
+        links.append({
+            'text': link.get_text(strip=True),
+            'href': link['href']
+        })
+    structured_data['links'] = links
+
+    # Extract images
+    images = []
+    for img in soup.find_all('img', src=True):
+        images.append({
+            'src': img['src'],
+            'alt': img.get('alt', '')
+        })
+    structured_data['images'] = images
+
+    return structured_data
 
 def query_public_case_law(query: str) -> List[Dict[str, Any]]:
-    """
-    Query publicly available case law databases and perform a web search to find related cases.
-    """
-    # Perform a web search to find relevant case law
-    search_url = f"https://www.google.com/search?q={query}+case+law+site:law.justia.com"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    """Query publicly available case law databases (Justia and CourtListener) to find related cases."""
+    cases = []
+    
+    # Justia Search using Google
+    justia_url = f"https://www.google.com/search?q={query}+case+law+site:law.justia.com"
+    justia_headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     
     try:
-        response = requests.get(search_url, headers=headers)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
+        justia_response = requests.get(justia_url, headers=justia_headers)
+        justia_response.raise_for_status()
+        justia_soup = BeautifulSoup(justia_response.text, 'html.parser')
         
-        search_results = soup.find_all('div', class_='g')
-        cases = []
+        justia_results = justia_soup.find_all('div', class_='g')
         
-        for result in search_results[:5]:  # Limit to top 5 results
-            title_elem = result.find('h3', class_='r')
+        for result in justia_results[:5]:  # Limit to top 5 results
+            title_elem = result.find('h3')
             link_elem = result.find('a')
-            snippet_elem = result.find('div', class_='s')
+            snippet_elem = result.find('div', class_='VwiC3b')
             
             if title_elem and link_elem and snippet_elem:
                 title = title_elem.text
@@ -350,16 +474,43 @@ def query_public_case_law(query: str) -> List[Dict[str, Any]]:
                     citation = "Citation not found"
                 
                 cases.append({
+                    "source": "Justia",
                     "case_name": case_name,
                     "citation": citation,
                     "summary": snippet,
                     "url": link
                 })
-        
-        return cases
     except requests.RequestException as e:
-        print(f"Error querying case law: {e}")
-        return []
+        print(f"Error querying Justia: {e}")
+
+    # CourtListener Search
+    courtlistener_url = f"https://www.courtlistener.com/api/rest/v3/search/?q={query}&type=o&format=json"
+    courtlistener_data = {}
+    for attempt in range(3):  # Retry up to 3 times
+        try:
+            courtlistener_response = requests.get(courtlistener_url)
+            courtlistener_response.raise_for_status()
+            courtlistener_data = courtlistener_response.json()
+            break
+        except (requests.RequestException, ValueError) as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt == 2:
+                print(f"Failed to retrieve or parse data from CourtListener: {e}")
+            time.sleep(2)
+
+    if 'results' in courtlistener_data:
+        for result in courtlistener_data['results'][:3]:  # Limit to 3 results
+            case_url = f"https://www.courtlistener.com{result['absolute_url']}"
+            cases.append({
+                "source": "CourtListener",
+                "case_name": result['caseName'],
+                "date_filed": result['dateFiled'],
+                "docket_number": result.get('docketNumber', 'Not available'),
+                "court": result['court'],
+                "url": case_url
+            })
+
+    return cases
 
 def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
     """Performs a comprehensive analysis of the document, including web and Wikipedia searches."""
@@ -387,42 +538,66 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
             "wikipedia_summary": {"summary": "Error occurred", "url": "", "title": ""}
         }
 
+def format_public_cases(cases: List[Dict[str, Any]]) -> str:
+    """Format public cases for the AI prompt."""
+    formatted = ""
+    for case in cases:
+        formatted += f"Source: {case['source']}\n"
+        formatted += f"Case Name: {case['case_name']}\n"
+        if 'citation' in case:
+            formatted += f"Citation: {case['citation']}\n"
+        if 'summary' in case:
+            formatted += f"Summary: {case['summary']}\n"
+        if 'date_filed' in case:
+            formatted += f"Date Filed: {case['date_filed']}\n"
+        if 'docket_number' in case:
+            formatted += f"Docket Number: {case['docket_number']}\n"
+        if 'court' in case:
+            formatted += f"Court: {case['court']}\n"
+        formatted += "\n"
+    return formatted
+
+def format_web_results(results: List[Dict[str, str]]) -> str:
+    """Format web search results for the AI prompt."""
+    formatted = ""
+    for result in results:
+        formatted += f"Title: {result['title']}\n"
+        formatted += f"Snippet: {result['snippet']}\n"
+        formatted += f"URL: {result['link']}\n\n"
+    return formatted
+
+
 def find_case_precedents(case_details: str) -> Dict[str, Any]:
     """Finds relevant case precedents based on provided details."""
     try:
-        # Initial AI analysis of the case details
-        analysis_prompt = f"Analyze the following case details and identify key legal concepts and relevant precedents:\n\n{case_details}"
-        initial_analysis = get_ai_response(analysis_prompt)
-        
         # Query public case law databases
         public_cases = query_public_case_law(case_details)
-        
-        # Perform web search (existing functionality)
+
+        # Perform web search
         web_results = search_web(f"legal precedent {case_details}", num_results=3)
-        
-        # Perform Wikipedia search (existing functionality)
+
+        # Perform Wikipedia search
         wiki_result = search_wikipedia(f"legal case {case_details}")
-        
+
         # Compile all information
-        compilation_prompt = f"""Compile a comprehensive summary of case precedents based on the following information:
-
-        Initial Analysis: {initial_analysis}
-
+        compilation_prompt = f"""
+        Analyze the following case details and identify key legal concepts and relevant precedents,
+        Analyze and the following case law information, focusing solely on factual elements and legal principles. Do not include any speculative or fictional content:
+        Case Details: {case_details}
         Public Case Law Results:
-        {public_cases}
-
+        {format_public_cases(public_cases)}
         Web Search Results:
-        {web_results}
-
+        {format_web_results(web_results)}
         Wikipedia Information:
         {wiki_result['summary']}
+        Provide a well-structured summary highlighting the most relevant precedents and legal principles
+        Do not introduce any hypothetical scenarios.
+        """
 
-        Provide a well-structured summary highlighting the most relevant precedents and legal principles."""
+        summary = get_ai_response(compilation_prompt)
 
-        final_summary = get_ai_response(compilation_prompt)
-        
         return {
-            "summary": final_summary,
+            "summary": summary,
             "public_cases": public_cases,
             "web_results": web_results,
             "wikipedia": wiki_result
@@ -447,43 +622,59 @@ def safe_find(element, selector, class_=None, attr=None):
         return found.get(attr) if attr else found.text.strip()
     return "Not available"
 
-def search_web_duckduckgo(query: str, num_results: int = 3) -> List[Dict[str, str]]:
+def search_web_duckduckgo(query: str, num_results: int = 3, max_retries: int = 3) -> List[Dict[str, str]]:
     """
-    Performs a web search using the DuckDuckGo search engine.
+    Performs a web search using the Google Custom Search API.
     Returns a list of dictionaries containing search result title, link, and snippet.
     """
-    base_url = "https://html.duckduckgo.com/html/"
-    params = {
-        'q': query,
-        's': '0',
-        'dc': '20',
-        'o': 'json',
-        'api': '/d.js'
-    }
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
+    api_key = "AIzaSyD-1OMuZ0CxGAek0PaXrzHOmcDWFvZQtm8"
+    cse_id = "877170db56f5c4629"
 
-    try:
-        response = requests.get(base_url, params=params, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        results = []
-        for result in soup.find_all('div', class_='result')[:num_results]:
-            title = result.find('a', class_='result__a').text.strip()
-            link = result.find('a', class_='result__a')['href']
-            snippet = result.find('a', class_='result__snippet').text.strip()
-            results.append({
-                'title': title,
-                'link': link,
-                'snippet': snippet
-            })
-        
-        return results
-    except requests.RequestException as e:
-        print(f"Error fetching web search results: {e}")
-        return []
+    user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36'
+    ]
+
+    for attempt in range(max_retries):
+        try:
+            headers = {'User-Agent': random.choice(user_agents)}
+            
+            service = build("customsearch", "v1", developerKey=api_key)
+
+            # Execute the search request
+            res = service.cse().list(q=query, cx=cse_id, num=num_results).execute()
+
+            results = []
+            if "items" in res:
+                for item in res["items"]:
+                    result = {
+                        "title": item["title"],
+                        "link": item["link"],
+                        "snippet": item.get("snippet", "")
+                    }
+                    results.append(result)
+                    if len(results) == num_results:
+                        break
+
+            return results
+
+        except HttpError as e:
+            print(f"HTTP error occurred: {e}. Attempt {attempt + 1} of {max_retries}")
+        except ConnectionError as e:
+            print(f"Connection error occurred: {e}. Attempt {attempt + 1} of {max_retries}")
+        except Timeout as e:
+            print(f"Timeout error occurred: {e}. Attempt {attempt + 1} of {max_retries}")
+        except RequestException as e:
+            print(f"An error occurred during the request: {e}. Attempt {attempt + 1} of {max_retries}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}. Attempt {attempt + 1} of {max_retries}")
+
+        # Exponential backoff
+        time.sleep(2 ** attempt)
+
+    print("Max retries reached. No results found.")
+    return []
 
 def estimate_legal_costs(case_type: str, complexity: str, state: str) -> Dict[str, Any]:
     """
@@ -650,7 +841,6 @@ def analyze_contract(contract_text: str) -> Dict[str, Any]:
         Analyze the following part of the contract ({i+1}/{len(chunks)}), identifying clauses that are favorable and unfavorable to each party involved. 
         Highlight potential areas of concern or clauses that could be exploited. 
         Provide specific examples within this part of the contract to support your analysis.
-
         **Contract Text (Part {i+1}/{len(chunks)}):**
         {chunk}
         """
@@ -1312,10 +1502,8 @@ def generate_legal_brief(case_info):
         5. Conclusion and recommendations
         6. An analysis of why the winning party won
         7. A review of how the losing party could have potentially won
-
         Case Information (Part {i+1}/{len(chunks)}):
         {chunk}
-
         Please provide a detailed and thorough response for the relevant sections based on this part of the information."""
 
         try:
@@ -1380,7 +1568,7 @@ st.markdown("""
         padding-right: 5rem;
     }
     h1 {
-        color: #1E3A8A;
+        color: #3e6ef7;
     }
     h2 {
         color: #3B82F6;
@@ -1508,67 +1696,63 @@ elif feature == "Document Analysis":
 elif feature == "Case Precedent Finder":
     st.subheader("Case Precedent Finder")
     
-    # Initialize session state for precedents if not exists
     if 'precedents' not in st.session_state:
         st.session_state.precedents = None
     
-    # Initialize session state for visibility toggles if not exists
-    if 'visibility_toggles' not in st.session_state:
-        st.session_state.visibility_toggles = {}
-    
-    case_details = st.text_area("Enter case details:")
-    if st.button("Find Precedents"):
+    case_details = st.text_area("Enter case details:", height=100)
+    if st.button("Find Precedents", type="primary"):
         with st.spinner("Searching for relevant case precedents..."):
             try:
                 st.session_state.precedents = find_case_precedents(case_details)
             except Exception as e:
                 st.error(f"An error occurred while finding case precedents: {str(e)}")
     
-    # Display results if precedents are available
     if st.session_state.precedents:
         precedents = st.session_state.precedents
         
-        st.write("### Summary of Relevant Case Precedents")
-        st.markdown(precedents["summary"])
+        st.markdown("## Summary of Relevant Case Precedents")
+        st.info(precedents["summary"])
         
-        st.write("### Related Cases from Public Databases")
+        st.markdown("## Related Cases from Public Databases")
         for i, case in enumerate(precedents["public_cases"], 1):
-            st.write(f"**{i}. {case['case_name']} - {case['citation']}**")
-            st.write(f"Summary: {case['summary']}")
-            st.write(f"[Read full case]({case['url']})")
-            st.write("---")
+            st.markdown(f"### {i}. {case['case_name']}")
+            col1, col2 = st.columns([1, 2])
+            with col1:
+                st.markdown(f"**Source:** {case['source']}")
+                st.markdown(f"**URL:** [View Case]({case['url']})")
+            with col2:
+                for field in ['summary', 'date_filed', 'docket_number', 'court']:
+                    if field in case and case[field]:
+                        st.markdown(f"**{field.replace('_', ' ').title()}:** {case[field]}")
+            st.markdown("---")
         
-        st.write("### Additional Web Results")
+        st.markdown("## Additional Web Results")
         for i, result in enumerate(precedents["web_results"], 1):
-            st.write(f"**{i}. [{result['title']}]({result['link']})**")
-            
-            # Create a unique key for each toggle
-            toggle_key = f"toggle_{i}"
-            
-            # Initialize the toggle state if it doesn't exist
-            if toggle_key not in st.session_state.visibility_toggles:
-                st.session_state.visibility_toggles[toggle_key] = False
-            
-            # Create a button to toggle visibility
-            if st.button(f"{'Hide' if st.session_state.visibility_toggles[toggle_key] else 'Show'} Full Details for Result {i}", key=f"button_{i}"):
-                st.session_state.visibility_toggles[toggle_key] = not st.session_state.visibility_toggles[toggle_key]
-            
-            # Show full details if toggle is True
-            if st.session_state.visibility_toggles[toggle_key]:
-                # Fetch and display more detailed content
-                detailed_content = fetch_detailed_content(result['link'])
-                st.markdown(detailed_content)
-            else:
-                # Show a brief summary when details are hidden
-                brief_summary = result['snippet'].split('\n')[0][:200] + "..." if len(result['snippet']) > 200 else result['snippet'].split('\n')[0]
-                st.write(f"Brief Summary: {brief_summary}")
-            
-            st.write("---")
+            st.markdown(f"### {i}. {result['title']}")
+            st.markdown(f"**Source:** [{result['link']}]({result['link']})")
+            st.markdown(f"**Snippet:** {result['snippet']}")
+            st.markdown("---")
         
-        st.write("### Wikipedia Information")
-        wiki_info = precedents["wikipedia"]
-        st.write(f"**[{wiki_info['title']}]({wiki_info['url']})**")
-        st.markdown(wiki_info['summary'])
+        if precedents["wikipedia"]:
+            st.markdown("## Wikipedia Information")
+            wiki_info = precedents["wikipedia"]
+            st.markdown(f"### {wiki_info['title']}")
+            st.markdown(wiki_info['summary'])
+            st.markdown(f"[Read more on Wikipedia]({wiki_info['url']})")
+        st.markdown(
+        """
+        <style>
+            .stTextArea > div > div > textarea {
+                font-size: 16px;
+            }
+            h1, h2, h3 {
+                margin-top: 1em;
+                margin-bottom: 0.5em;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 elif feature == "Legal Cost Estimator":
     legal_cost_estimator_ui()
