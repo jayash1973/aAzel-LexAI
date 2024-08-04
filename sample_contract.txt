@@ -1,0 +1,56 @@
+NON-DISCLOSURE AGREEMENT
+This Non-Disclosure Agreement (the "Agreement") is entered into on [DATE] by and between:
+Company: XYZ Corp., a corporation organized and existing under the laws of [STATE], with its principal place of business at [ADDRESS] (hereinafter referred to as the "Company")
+and
+Recipient: [NAME], an individual residing at [ADDRESS] (hereinafter referred to as the "Recipient")
+WHEREAS, the Company wishes to share certain confidential information with the Recipient for the purpose of [PURPOSE], and the Recipient agrees to maintain the confidentiality of such information in accordance with the terms and conditions of this Agreement.
+NOW, THEREFORE, in consideration of the promises and covenants contained herein, the parties agree as follows:
+
+Definition of Confidential Information
+Confidential Information shall mean any and all non-public information, including but not limited to, trade secrets, proprietary information, technical data, business strategies, customer lists, financial information, and any other information disclosed by the Company to the Recipient, whether in writing, orally, or by any other means.
+Obligations of the Recipient
+The Recipient agrees to:
+a) Hold the Confidential Information in strict confidence;
+b) Use the Confidential Information solely for the purpose specified above;
+c) Not disclose the Confidential Information to any third party without prior written consent from the Company;
+d) Take all reasonable precautions to prevent unauthorized disclosure or use of the Confidential Information.
+Exclusions from Confidential Information
+The obligations of confidentiality shall not apply to information that:
+a) Was already known to the Recipient prior to disclosure by the Company;
+b) Is or becomes publicly available through no fault of the Recipient;
+c) Is independently developed by the Recipient without use of the Confidential Information;
+d) Is disclosed by the Recipient with the Company's prior written approval.
+Term and Termination
+This Agreement shall remain in effect for a period of five (5) years from the date of execution. Upon termination or expiration of this Agreement, the Recipient shall promptly return or destroy all Confidential Information and any copies thereof.
+No Grant of Rights
+Nothing in this Agreement shall be construed as granting any rights, license, or ownership interest in the Confidential Information to the Recipient.
+Injunctive Relief (Potentially Exploitative)
+The Recipient acknowledges that any breach of this Agreement may result in immediate and irreparable damage to the Company. The Recipient agrees that the Company shall be entitled to injunctive relief and specific performance, without the need to post a bond, in addition to all other remedies available at law or in equity.
+Governing Law and Jurisdiction (Potentially Exploitative)
+This Agreement shall be governed by and construed in accordance with the laws of [STATE], without regard to its conflict of law principles. Any dispute arising out of or relating to this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in [CITY, STATE], and the parties hereby consent to the personal jurisdiction of these courts.
+Assignment (Potentially Exploitative)
+The Company may assign this Agreement and its rights hereunder to any third party without the Recipient's consent. The Recipient may not assign or transfer any rights or obligations under this Agreement without the prior written consent of the Company.
+Indemnification (Potentially Exploitative)
+The Recipient agrees to indemnify, defend, and hold harmless the Company and its officers, directors, employees, and agents from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to the Recipient's breach of this Agreement.
+Modification of Agreement
+This Agreement may only be modified by a written instrument signed by both parties. Any waiver of any provision of this Agreement shall be in writing and signed by the party against whom it is to be enforced.
+Severability
+If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+Entire Agreement
+This Agreement constitutes the entire understanding between the parties with respect to the subject matter hereof and supersedes all prior agreements, whether written or oral, relating to the same subject matter.
+Counterparts (Beneficial to Recipient)
+This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument. Electronic signatures shall be deemed to be original signatures for all purposes.
+Limited Liability (Beneficial to Recipient)
+In no event shall either party be liable to the other for any indirect, incidental, consequential, special, or punitive damages arising out of or related to this Agreement, even if advised of the possibility of such damages.
+Survival (Beneficial to Recipient)
+The obligations of confidentiality under this Agreement shall survive the termination or expiration of this Agreement for a period of two (2) years.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Non-Disclosure Agreement as of the date first above written.
+COMPANY:
+XYZ Corp.
+By: ________________________
+Name: [NAME]
+Title: [TITLE]
+RECIPIENT:
+
+[NAME]

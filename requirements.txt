@@ -1,0 +1,17 @@
+streamlit
+pandas
+plotly
+requests
+ai71
+PyPDF2
+python-docx
+matplotlib
+beautifulsoup4
+wikipedia-api
+google-api-python-client
+httpx
+langchain
+langchain_community
+sentence-transformers
+streamlit-lottie
+wikipedia
