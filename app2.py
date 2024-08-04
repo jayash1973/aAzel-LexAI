@@ -44,7 +44,7 @@ except ImportError:
     st.stop()
 
 # Constants
-AI71_API_KEY = "api71-api-92fc2ef9-9f3c-47e5-a019-18e257b04af2"
+AI71_API_KEY = "enter your falcon api key"
 
 # Initialize AI71 client
 try:
