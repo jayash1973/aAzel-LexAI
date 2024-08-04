@@ -1,6 +1,3 @@
-Okay, here's the revised `README.md` file with improved formatting, clearer instructions, and addressed issues:
-
-```markdown
 # LexAI - Your Advanced Legal Assistant
 
 LexAI is an AI-powered legal assistant built for the Falcon Hackathon. It leverages the cutting-edge capabilities of the Falcon LLM to simplify legal processes, making legal information and tools accessible to everyone.
@@ -66,7 +63,6 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 For inquiries or support, please contact Jayash Bhardwaj at jayashbhardwaj3@gmail.com.
 
-```
 
 **Key Improvements:**
 
