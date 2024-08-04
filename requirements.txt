@@ -2,7 +2,6 @@ streamlit
 pandas
 plotly
 requests
-ai71
 PyPDF2
 python-docx
 matplotlib
@@ -11,7 +10,19 @@ wikipedia-api
 google-api-python-client
 httpx
 langchain
+langchain-huggingface
 langchain_community
 sentence-transformers
 streamlit-lottie
 wikipedia
+faiss-gpu
+faiss-cpu
+selenium
+webdriver_manager
+scikit-learn
+networkx
+tabula-py
+spacy==3.7.2
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+pydantic>=1.8.2,<3.0.0
+ai71==0.0.18
