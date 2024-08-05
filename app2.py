@@ -10,6 +10,7 @@ import PyPDF2
 import io
 import random
 import docx
+import os
 from docx import Document
 from docx.shared import Inches
 from datetime import datetime
@@ -47,8 +48,7 @@ except ImportError:
     st.error("Missing dependency: streamlit_lottie. Please install it using 'pip install streamlit-lottie'")
     st.stop()
 
-# Constants
-AI71_API_KEY = "your AI71 falcon api key here"
+AI71_API_KEY = "AI71 falcon apikey"
 
 # Initialize AI71 client
 try:
@@ -57,7 +57,6 @@ except Exception as e:
     st.error(f"Failed to initialize AI71 client: {str(e)}")
     st.stop()
 
-# Initialize chat history and other session state variables
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "uploaded_documents" not in st.session_state:
@@ -114,7 +113,7 @@ def get_ai_response(prompt: str) -> str:
     except Exception as e:
         print(f"Streaming failed, falling back to non-streaming request. Error: {e}")
         try:
-            # Fall back to non-streaming request
+            # makes it fall back to non-streaming request
             completion = ai71.chat.completions.create(
                 model="tiiuae/falcon-180b-chat",
                 messages=messages,
@@ -177,7 +176,7 @@ def search_web(query: str, num_results: int = 3) -> List[Dict[str, str]]:
         results = []
         if "items" in res:
             for item in res["items"]:
-                # Check if the result is relevant (you may need to adjust these conditions)
+                # Check if the result is relevant
                 if any(keyword in item["title"].lower() or keyword in item["snippet"].lower() 
                        for keyword in ["law", "legal", "court", "case", "attorney", "lawyer"]):
                     result = {
@@ -229,7 +228,7 @@ def perform_web_search(query: str) -> List[Dict[str, Any]]:
                     "cost_estimates": cost_estimates
                 })
 
-    return results[:3]  # Return top 3 results with cost estimates
+    return results[:3]  # Return top 3 results with their cost estimates
 
 def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
     """Performs a comprehensive analysis of the document, including web and Wikipedia searches."""
@@ -246,7 +245,7 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
         
         return {
             "document_analysis": document_analysis,
-            "related_articles": web_results or [],  # Ensure this is always a list
+            "related_articles": web_results or [],  # Ensure that this this is always a list
             "wikipedia_summary": wiki_results
         }
     except Exception as e:
@@ -259,7 +258,7 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
 
 def search_wikipedia(query: str, sentences: int = 2) -> Dict[str, str]:
     try:
-        # Ensure query is a string before slicing
+        # Ensures that the query is a string before slicing
         truncated_query = str(query)[:300]
         
         # Search Wikipedia
@@ -276,7 +275,6 @@ def search_wikipedia(query: str, sentences: int = 2) -> Dict[str, str]:
             summary = wikipedia.summary(page.title, sentences=sentences, auto_suggest=False)
             return {"summary": summary, "url": page.url, "title": page.title}
         except wikipedia.exceptions.DisambiguationError as e:
-            # If it's a disambiguation page, choose the first option
             try:
                 page = wikipedia.page(e.options[0], auto_suggest=False)
                 summary = wikipedia.summary(page.title, sentences=sentences, auto_suggest=False)
@@ -454,7 +452,7 @@ def query_public_case_law(query: str) -> List[Dict[str, Any]]:
         
         justia_results = justia_soup.find_all('div', class_='g')
         
-        for result in justia_results[:5]:  # Limit to top 5 results
+        for result in justia_results[:5]:  # Limits it to top 5 results
             title_elem = result.find('h3')
             link_elem = result.find('a')
             snippet_elem = result.find('div', class_='VwiC3b')
@@ -464,7 +462,7 @@ def query_public_case_law(query: str) -> List[Dict[str, Any]]:
                 link = link_elem['href']
                 snippet = snippet_elem.text
                 
-                # Extract case name and citation from the title
+                # it extract case name and citation from the title
                 case_info = title.split(' - ')
                 if len(case_info) >= 2:
                     case_name = case_info[0]
@@ -518,7 +516,6 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
         analysis_prompt = f"Analyze the following legal document and provide a summary, potential issues, and key clauses:\n\n{content}"
         document_analysis = get_ai_response(analysis_prompt)
         
-        # Extract main topics or keywords from the document
         topic_extraction_prompt = f"Extract the main topics or keywords from the following document summary:\n\n{document_analysis}"
         topics = get_ai_response(topic_extraction_prompt)
         
@@ -527,7 +524,7 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
         
         return {
             "document_analysis": document_analysis,
-            "related_articles": web_results or [],  # Ensure this is always a list
+            "related_articles": web_results or [],
             "wikipedia_summary": wiki_results
         }
     except Exception as e:
@@ -583,13 +580,18 @@ def find_case_precedents(case_details: str) -> Dict[str, Any]:
         compilation_prompt = f"""
         Analyze the following case details and identify key legal concepts and relevant precedents,
         Analyze and the following case law information, focusing solely on factual elements and legal principles. Do not include any speculative or fictional content:
+
         Case Details: {case_details}
+
         Public Case Law Results:
         {format_public_cases(public_cases)}
+
         Web Search Results:
         {format_web_results(web_results)}
+
         Wikipedia Information:
         {wiki_result['summary']}
+
         Provide a well-structured summary highlighting the most relevant precedents and legal principles
         Do not introduce any hypothetical scenarios.
         """
@@ -642,7 +644,6 @@ def search_web_duckduckgo(query: str, num_results: int = 3, max_retries: int = 3
             
             service = build("customsearch", "v1", developerKey=api_key)
 
-            # Execute the search request
             res = service.cse().list(q=query, cx=cse_id, num=num_results).execute()
 
             results = []
@@ -841,6 +842,7 @@ def analyze_contract(contract_text: str) -> Dict[str, Any]:
         Analyze the following part of the contract ({i+1}/{len(chunks)}), identifying clauses that are favorable and unfavorable to each party involved. 
         Highlight potential areas of concern or clauses that could be exploited. 
         Provide specific examples within this part of the contract to support your analysis.
+
         **Contract Text (Part {i+1}/{len(chunks)}):**
         {chunk}
         """
@@ -957,7 +959,7 @@ def case_trend_visualizer_ui():
             # Display the Plotly chart
             st.plotly_chart(fig, use_container_width=True)
 
-            # --- Display Statistics ---
+            # Display Statistics
             st.subheader("Case Statistics")
             total_cases = df['Number of Cases'].sum()
             avg_cases = df['Number of Cases'].mean()
@@ -969,13 +971,13 @@ def case_trend_visualizer_ui():
             col2.metric("Average Cases per Year", f"{avg_cases:,.0f}")
             col3.metric("Peak Year", f"{max_year}")
 
-            # --- Trend Description ---
+            # Trend Description
             st.write("Trend Description:", get_trend_description(df))
 
     if st.session_state.current_data is not None:
         df = st.session_state.current_data
 
-        # --- Interactive Analysis Section ---
+        # Interactive Analysis Section
         st.subheader("Interactive Analysis")
 
         # Year-over-Year Change
@@ -992,11 +994,11 @@ def case_trend_visualizer_ui():
         ma_fig = px.line(df, x='Year', y=['Number of Cases', 'Moving Average'], title=f"{window}-Year Moving Average")
         st.plotly_chart(ma_fig, use_container_width=True)
 
-        # --- Raw Data ---
+        # Raw Data
         st.subheader("Raw Data")
         st.dataframe(df)
 
-        # --- Download Options ---
+        # Download Options
         csv = df.to_csv(index=False)
         st.download_button(
             label="Download data as CSV",
@@ -1005,7 +1007,7 @@ def case_trend_visualizer_ui():
             mime="text/csv",
         )
 
-        # --- Additional Information & Data Sources ---
+        # Additional Information & Data Sources
         st.subheader("Additional Information")
         info = get_additional_info(case_type)
         st.markdown(info)
@@ -1250,6 +1252,7 @@ def get_trend_description(df):
     else:
         return "The number of cases has remained relatively stable over the five-year period."
 
+
 class LegalDataRetriever:
     def __init__(self):
         self.session = requests.Session()
@@ -1340,7 +1343,7 @@ class LegalDataRetriever:
         if author_elem:
             author = author_elem.text.strip()
         elif judges and judges[0] != "Not available":
-            author = judges[0]  # Assume the first judge is the author if not explicitly stated
+            author = judges[0]
         
         if author == "Not available":
             self.logger.warning("No author found in the HTML structure, searching in text content")
@@ -1359,24 +1362,21 @@ class LegalDataRetriever:
         return author
 
     def extract_court_opinion(self, soup):
-        # Target the article tag with class col-sm-9 first
         article_div = soup.find('article', class_='col-sm-9')
         if not article_div:
             self.logger.error("Could not find the main article div (col-sm-9).")
             return "Case details not available (main article div not found)."
 
-        # Find the tab-content div within the article div
         opinion_div = article_div.find('div', class_='tab-content')
         if not opinion_div:
             self.logger.error("Could not find the case details content (tab-content div).")
             return "Case details not available (tab-content div not found)."
 
-        # Extract all text from the tab-content div
         case_details = opinion_div.get_text(separator='\n', strip=True)
 
         # Clean up the text
-        case_details = re.sub(r'\n+', '\n', case_details)  # Remove multiple newlines
-        case_details = re.sub(r'\s+', ' ', case_details)  # Remove extra whitespace
+        case_details = re.sub(r'\n+', '\n', case_details)
+        case_details = re.sub(r'\s+', ' ', case_details)
 
         return case_details
 
@@ -1502,8 +1502,10 @@ def generate_legal_brief(case_info):
         5. Conclusion and recommendations
         6. An analysis of why the winning party won
         7. A review of how the losing party could have potentially won
+
         Case Information (Part {i+1}/{len(chunks)}):
         {chunk}
+
         Please provide a detailed and thorough response for the relevant sections based on this part of the information."""
 
         try:
@@ -1554,8 +1556,223 @@ def automated_legal_brief_generation_ui():
             file_name="legal_brief.txt",
             mime="text/plain"
         )
+
+STATES = [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+    "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+    "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+    "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+    "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+]
+
+CITIES_BY_STATE = {
+    "Alabama": ["Birmingham", "Montgomery", "Mobile", "Huntsville"],
+    "Alaska": ["Anchorage", "Fairbanks", "Juneau"],
+    "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler"],
+    "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville"],
+    "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
+    "Colorado": ["Denver", "Colorado Springs", "Aurora", "Fort Collins"],
+    "Connecticut": ["Bridgeport", "New Haven", "Hartford", "Stamford"],
+    "Delaware": ["Wilmington", "Dover", "Newark"],
+    "Florida": ["Miami", "Orlando", "Jacksonville", "Tampa"],
+    "Georgia": ["Atlanta", "Augusta", "Columbus", "Savannah"],
+    "Hawaii": ["Honolulu", "Hilo", "Kailua"],
+    "Idaho": ["Boise", "Nampa", "Meridian"],
+    "Illinois": ["Chicago", "Aurora", "Rockford", "Joliet"],
+    "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"],
+    "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"],
+    "Kansas": ["Wichita", "Overland Park", "Kansas City"],
+    "Kentucky": ["Louisville", "Lexington", "Bowling Green"],
+    "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"],
+    "Maine": ["Portland", "Lewiston", "Bangor"],
+    "Maryland": ["Baltimore", "Columbia", "Annapolis"],
+    "Massachusetts": ["Boston", "Worcester", "Springfield"],
+    "Michigan": ["Detroit", "Grand Rapids", "Ann Arbor"],
+    "Minnesota": ["Minneapolis", "St. Paul", "Rochester"],
+    "Mississippi": ["Jackson", "Gulfport", "Southaven"],
+    "Missouri": ["Kansas City", "St. Louis", "Springfield"],
+    "Montana": ["Billings", "Missoula", "Great Falls"],
+    "Nebraska": ["Omaha", "Lincoln", "Bellevue"],
+    "Nevada": ["Las Vegas", "Reno", "Henderson"],
+    "New Hampshire": ["Manchester", "Nashua", "Concord"],
+    "New Jersey": ["Newark", "Jersey City", "Paterson"],
+    "New Mexico": ["Albuquerque", "Las Cruces", "Santa Fe"],
+    "New York": ["New York City", "Buffalo", "Rochester", "Syracuse"],
+    "North Carolina": ["Charlotte", "Raleigh", "Greensboro"],
+    "North Dakota": ["Fargo", "Bismarck", "Grand Forks"],
+    "Ohio": ["Columbus", "Cleveland", "Cincinnati"],
+    "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"],
+    "Oregon": ["Portland", "Eugene", "Salem"],
+    "Pennsylvania": ["Philadelphia", "Pittsburgh", "Allentown"],
+    "Rhode Island": ["Providence", "Warwick", "Cranston"],
+    "South Carolina": ["Charleston", "Columbia", "North Charleston"],
+    "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"],
+    "Tennessee": ["Nashville", "Memphis", "Knoxville"],
+    "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
+    "Utah": ["Salt Lake City", "West Valley City", "Provo"],
+    "Vermont": ["Burlington", "South Burlington", "Rutland"],
+    "Virginia": ["Virginia Beach", "Norfolk", "Chesapeake"],
+    "Washington": ["Seattle", "Spokane", "Tacoma"],
+    "West Virginia": ["Charleston", "Huntington", "Morgantown"],
+    "Wisconsin": ["Milwaukee", "Madison", "Green Bay"],
+    "Wyoming": ["Cheyenne", "Casper", "Laramie"]
+}
+
+def find_lawyers(state, city, pages=1):
+    base_url = "https://www.justia.com/lawyers/"
+    url = f"{base_url}{state.lower()}/{city.lower().replace(' ', '-')}"
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    names = []
+    short_bios = []
+    specializations = []
+    universities = []
+    addresses = []
+    phones = []
+    email_links = []
+    site_links = []
+    
+    try:
+        for page in range(1, pages + 1):
+            page_url = f"{url}?page={page}"
+            response = requests.get(page_url, headers=headers)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            results = soup.find_all('div', {'data-vars-action': 'OrganicListing'})
+            
+            for result in results:
+                # Name
+                try:
+                    names.append(result.find('strong', {'class': 'lawyer-name'}).get_text().strip())
+                except:
+                    names.append('')
+                
+                # Short Bio
+                try:
+                    short_bios.append(result.find('div', {'class': 'lawyer-expl'}).get_text().strip())
+                except:
+                    short_bios.append('')
+                
+                # Specialization
+                try:
+                    specializations.append(result.find('span', {'class': '-practices'}).get_text().strip())
+                except:
+                    specializations.append('')
+                
+                # University
+                try:
+                    universities.append(result.find('span', {'class': '-law-schools'}).get_text().strip())
+                except:
+                    universities.append('')
+                
+                # Address
+                try:
+                    addresses.append(result.find('span', {'class': '-address'}).get_text().strip().replace("\t", '').replace('\n', ', '))
+                except:
+                    addresses.append('')
+                
+                # Phone
+                try:
+                    phones.append(result.find('strong', {'class': '-phone'}).get_text().strip())
+                except:
+                    phones.append('')
+                
+                # Email Link
+                try:
+                    email_links.append(result.find('a', {'class': '-email'}).get('href'))
+                except:
+                    email_links.append('')
+                
+                # Site Link
+                try:
+                    site_links.append(result.find('a', {'class': '-website'}).get('href'))
+                except:
+                    site_links.append('')
+        
+        df_lawyers = pd.DataFrame({
+            'lawyer_name': names,
+            'short_bio': short_bios,
+            'specialization': specializations,
+            'university': universities,
+            'address': addresses,
+            'phone': phones,
+            'email_link': email_links,
+            'site_link': site_links
+        })
+        
+        return df_lawyers
+    
+    except requests.RequestException as e:
+        st.error(f"An error occurred while fetching lawyer information: {str(e)}")
+        return pd.DataFrame()
+
+def lawyer_finder_ui():
+    st.title("Find Lawyers in Your Area")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        state = st.selectbox("Select a State:", STATES)
+    
+    with col2:
+        cities = CITIES_BY_STATE.get(state, [])
+        city = st.selectbox("Select a City:", cities)
+    
+    if not city:
+        st.warning("Please select a city to continue.")
+        return
+    
+    pages = st.slider("Number of pages to scrape", 1, 20, 1)
+    
+    if st.button("Find Lawyers", type="primary"):
+        with st.spinner("Searching for lawyers in your area..."):
+            df_lawyers = find_lawyers(state, city, pages)
+            
+            if not df_lawyers.empty:
+                st.success(f"Found {len(df_lawyers)} lawyers in {city}, {state}.")
+                
+                # Display results in a more visually appealing way
+                st.subheader("Lawyer Directory")
+                for i in range(0, len(df_lawyers), 3):
+                    cols = st.columns(3)
+                    for j in range(3):
+                        if i + j < len(df_lawyers):
+                            lawyer = df_lawyers.iloc[i + j]
+                            with cols[j]:
+                                st.markdown(f"**{lawyer['lawyer_name']}**")
+                                st.markdown(f"*{lawyer['specialization']}*")
+                                if lawyer['phone']:
+                                    st.markdown(f"📞 {lawyer['phone']}")
+                                if lawyer['email_link']:
+                                    st.markdown(f"📧 [Email]({lawyer['email_link']})")
+                                if lawyer['site_link']:
+                                    st.markdown(f"🌐 [Website]({lawyer['site_link']})")
+                                st.markdown("---")
+                
+                # Show CSV preview with vertical and horizontal scrolling
+                st.subheader("Data Preview")
+                st.dataframe(
+                    df_lawyers,
+                    height=400,
+                    width=600,
+                    use_container_width=True,
+                )
+                
+                # Provide CSV download option
+                csv = df_lawyers.to_csv(index=False)
+                st.download_button(
+                    label="Download complete data as CSV",
+                    data=csv,
+                    file_name="lawyers_data.csv",
+                    mime="text/csv",
+                )
+            else:
+                st.warning(f"No lawyers found in {city}, {state}. Try selecting a different city or state.")
+
 # --- Streamlit App ---
-# Custom CSS to improve the overall look
 st.markdown("""
 <style>
     .reportview-container {
@@ -1607,7 +1824,7 @@ with st.sidebar:
     
     feature = st.selectbox(
         "Select a feature",
-        ["Legal Chatbot", "Document Analysis", "Case Precedent Finder", "Legal Cost Estimator", "Contract Analysis", "Case Trend Visualizer", "Case Information Retrieval", "Automated Legal Brief Generation"]
+        ["Legal Chatbot", "Document Analysis", "Case Precedent Finder", "Legal Cost Estimator", "Contract Analysis", "Case Trend Visualizer", "Case Information Retrieval", "Automated Legal Brief Generation", "Find the Lawyers"]
     )
 if feature == "Legal Chatbot":
     st.subheader("Legal Chatbot")
@@ -1768,8 +1985,10 @@ elif feature == "Case Information Retrieval":
 
 elif feature == "Automated Legal Brief Generation":
     automated_legal_brief_generation_ui()
-# Add a footer with a disclaimer
-# Footer
+
+elif feature == "Find the Lawyers":
+    lawyer_finder_ui()
+
 st.markdown("---")
 st.markdown(
     """
