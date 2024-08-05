@@ -52,7 +52,6 @@ streamlit run app.py
 Open your web browser and navigate to `http://localhost:8501` to start using LexAI.
 
 ## Contribution
-
 Contributions to LexAI are encouraged! Fork the repository, create a new branch, make your changes, and submit a pull request.
 
 ## License
