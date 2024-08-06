@@ -48,7 +48,7 @@ except ImportError:
     st.error("Missing dependency: streamlit_lottie. Please install it using 'pip install streamlit-lottie'")
     st.stop()
 
-AI71_API_KEY = "AI71 Falcon API key"
+AI71_API_KEY = "AI71 Falcon API Key"
 
 # Initialize AI71 client
 try:
@@ -516,7 +516,7 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
         analysis_prompt = f"Analyze the following legal document and provide a summary, potential issues, and key clauses:\n\n{content}"
         document_analysis = get_ai_response(analysis_prompt)
         
-        topic_extraction_prompt = f"Extract the main topics or keywords from the following document summary:\n\n{document_analysis}"
+        topic_extraction_prompt = f"Extract the main topics or keywords from the following document summary relevant for web search and wikipedia search related to the document:\n\n{document_analysis}"
         topics = get_ai_response(topic_extraction_prompt)
         
         web_results = search_web(topics)
@@ -594,6 +594,7 @@ def find_case_precedents(case_details: str) -> Dict[str, Any]:
 
         Provide a well-structured summary highlighting the most relevant precedents and legal principles
         Do not introduce any hypothetical scenarios.
+        And if the information from web, wikipedia and case details are not available then ask the user reframe their prompt and resubmit the prompt and also generate a case summary based on the cases that have happened before based on the data you are trained on and do not include and of the hypothical data or fiction data and also tell the user that this summary is generated based on the data falcon 180B is trained on
         """
 
         summary = get_ai_response(compilation_prompt)
@@ -857,7 +858,9 @@ def analyze_contract(contract_text: str) -> Dict[str, Any]:
 
 def contract_analysis_ui():
     st.subheader("Contract Analyzer")
-
+    with st.expander("How to use"):
+        st.write('''upload the file and click on analyse contract it will generate analysis of that analysis.''')
+    st.warning("Do not upload too big files as it might end up consuming all the tokens and the response generation will take too much time")
     uploaded_file = st.file_uploader(
         "Upload a contract document (PDF, DOCX, or TXT)",
         type=["pdf", "docx", "txt"],
@@ -1406,6 +1409,9 @@ class LegalDataRetriever:
 
 def case_info_retriever():
     st.subheader("Case Information Retriever")
+    with st.expander("How to use"):
+        st.write('''Enter the case details or case name and based on that it will find the cases similar to it.
+Keep the prompt as short as 5 words other wise it might show error in finding case''')
     query = st.text_input("Enter case name, number, or any relevant information:")
     if st.button("Retrieve Case Information"):
         with st.spinner("Retrieving case information..."):
@@ -1526,7 +1532,7 @@ def generate_legal_brief(case_info):
     return full_brief
 
 def automated_legal_brief_generation_ui():
-    st.title("Automated Legal Brief Generation")
+    st.subheader("Automated Legal Brief Generation")
     with st.expander("How to use"):
         st.write('''Enter the case details and based on that it will generate a legal brief and also provide you with the proper analysis of the case and how you can win this case and where you have to be carefull''')
     if 'legal_brief' not in st.session_state:
@@ -1588,56 +1594,56 @@ STATES = [
 ]
 
 CITIES_BY_STATE = {
-    "Alabama": ["Birmingham", "Montgomery", "Mobile", "Huntsville"],
-    "Alaska": ["Anchorage", "Fairbanks", "Juneau"],
-    "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler"],
-    "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville"],
-    "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
-    "Colorado": ["Denver", "Colorado Springs", "Aurora", "Fort Collins"],
-    "Connecticut": ["Bridgeport", "New Haven", "Hartford", "Stamford"],
-    "Delaware": ["Wilmington", "Dover", "Newark"],
-    "Florida": ["Miami", "Orlando", "Jacksonville", "Tampa"],
-    "Georgia": ["Atlanta", "Augusta", "Columbus", "Savannah"],
-    "Hawaii": ["Honolulu", "Hilo", "Kailua"],
-    "Idaho": ["Boise", "Nampa", "Meridian"],
-    "Illinois": ["Chicago", "Aurora", "Rockford", "Joliet"],
-    "Indiana": ["Indianapolis", "Fort Wayne", "Evansville"],
-    "Iowa": ["Des Moines", "Cedar Rapids", "Davenport"],
-    "Kansas": ["Wichita", "Overland Park", "Kansas City"],
-    "Kentucky": ["Louisville", "Lexington", "Bowling Green"],
-    "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport"],
-    "Maine": ["Portland", "Lewiston", "Bangor"],
-    "Maryland": ["Baltimore", "Columbia", "Annapolis"],
-    "Massachusetts": ["Boston", "Worcester", "Springfield"],
-    "Michigan": ["Detroit", "Grand Rapids", "Ann Arbor"],
-    "Minnesota": ["Minneapolis", "St. Paul", "Rochester"],
-    "Mississippi": ["Jackson", "Gulfport", "Southaven"],
-    "Missouri": ["Kansas City", "St. Louis", "Springfield"],
-    "Montana": ["Billings", "Missoula", "Great Falls"],
-    "Nebraska": ["Omaha", "Lincoln", "Bellevue"],
-    "Nevada": ["Las Vegas", "Reno", "Henderson"],
-    "New Hampshire": ["Manchester", "Nashua", "Concord"],
-    "New Jersey": ["Newark", "Jersey City", "Paterson"],
-    "New Mexico": ["Albuquerque", "Las Cruces", "Santa Fe"],
-    "New York": ["New York City", "Buffalo", "Rochester", "Syracuse"],
-    "North Carolina": ["Charlotte", "Raleigh", "Greensboro"],
-    "North Dakota": ["Fargo", "Bismarck", "Grand Forks"],
-    "Ohio": ["Columbus", "Cleveland", "Cincinnati"],
-    "Oklahoma": ["Oklahoma City", "Tulsa", "Norman"],
-    "Oregon": ["Portland", "Eugene", "Salem"],
-    "Pennsylvania": ["Philadelphia", "Pittsburgh", "Allentown"],
-    "Rhode Island": ["Providence", "Warwick", "Cranston"],
-    "South Carolina": ["Charleston", "Columbia", "North Charleston"],
-    "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen"],
-    "Tennessee": ["Nashville", "Memphis", "Knoxville"],
-    "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
-    "Utah": ["Salt Lake City", "West Valley City", "Provo"],
-    "Vermont": ["Burlington", "South Burlington", "Rutland"],
-    "Virginia": ["Virginia Beach", "Norfolk", "Chesapeake"],
-    "Washington": ["Seattle", "Spokane", "Tacoma"],
-    "West Virginia": ["Charleston", "Huntington", "Morgantown"],
-    "Wisconsin": ["Milwaukee", "Madison", "Green Bay"],
-    "Wyoming": ["Cheyenne", "Casper", "Laramie"]
+    "Alabama": ["Birmingham", "Montgomery", "Mobile", "Huntsville", "Tuscaloosa", "Hoover", "Dothan", "Auburn", "Decatur", "Madison"],
+    "Alaska": ["Anchorage", "Fairbanks", "Juneau", "Sitka", "Ketchikan", "Wasilla", "Kenai", "Kodiak", "Bethel", "Palmer"],
+    "Arizona": ["Phoenix", "Tucson", "Mesa", "Chandler", "Scottsdale", "Glendale", "Gilbert", "Tempe", "Peoria", "Surprise"],
+    "Arkansas": ["Little Rock", "Fort Smith", "Fayetteville", "Springdale", "Jonesboro", "North Little Rock", "Conway", "Rogers", "Pine Bluff", "Bentonville"],
+    "California": ["Los Angeles", "San Diego", "San Jose", "San Francisco", "Fresno", "Sacramento", "Long Beach", "Oakland", "Bakersfield", "Anaheim"],
+    "Colorado": ["Denver", "Colorado Springs", "Aurora", "Fort Collins", "Lakewood", "Thornton", "Arvada", "Westminster", "Pueblo", "Centennial"],
+    "Connecticut": ["Bridgeport", "New Haven", "Hartford", "Stamford", "Waterbury", "Norwalk", "Danbury", "New Britain", "West Hartford", "Greenwich"],
+    "Delaware": ["Wilmington", "Dover", "Newark", "Middletown", "Smyrna", "Milford", "Seaford", "Georgetown", "Elsmere", "New Castle"],
+    "Florida": ["Jacksonville", "Miami", "Tampa", "Orlando", "St. Petersburg", "Hialeah", "Tallahassee", "Fort Lauderdale", "Port St. Lucie", "Cape Coral"],
+    "Georgia": ["Atlanta", "Augusta", "Columbus", "Macon", "Savannah", "Athens", "Sandy Springs", "Roswell", "Johns Creek", "Albany"],
+    "Hawaii": ["Honolulu", "East Honolulu", "Pearl City", "Hilo", "Kailua", "Waipahu", "Kaneohe", "Mililani Town", "Kahului", "Ewa Gentry"],
+    "Idaho": ["Boise", "Meridian", "Nampa", "Idaho Falls", "Pocatello", "Caldwell", "Coeur d'Alene", "Twin Falls", "Lewiston", "Post Falls"],
+    "Illinois": ["Chicago", "Aurora", "Joliet", "Naperville", "Rockford", "Elgin", "Springfield", "Peoria", "Champaign", "Waukegan"],
+    "Indiana": ["Indianapolis", "Fort Wayne", "Evansville", "South Bend", "Carmel", "Bloomington", "Fishers", "Hammond", "Gary", "Lafayette"],
+    "Iowa": ["Des Moines", "Cedar Rapids", "Davenport", "Sioux City", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Council Bluffs", "Dubuque"],
+    "Kansas": ["Wichita", "Overland Park", "Kansas City", "Olathe", "Topeka", "Lawrence", "Shawnee", "Manhattan", "Lenexa", "Salina"],
+    "Kentucky": ["Louisville", "Lexington", "Bowling Green", "Owensboro", "Covington", "Richmond", "Georgetown", "Florence", "Hopkinsville", "Nicholasville"],
+    "Louisiana": ["New Orleans", "Baton Rouge", "Shreveport", "Lafayette", "Lake Charles", "Kenner", "Bossier City", "Monroe", "Alexandria", "New Iberia"],
+    "Maine": ["Portland", "Lewiston", "Bangor", "South Portland", "Auburn", "Biddeford", "Sanford", "Brunswick", "Augusta", "Saco"],
+    "Maryland": ["Baltimore", "Columbia", "Germantown", "Silver Spring", "Waldorf", "Glen Burnie", "Frederick", "Ellicott City", "Dundalk", "Rockville"],
+    "Massachusetts": ["Boston", "Worcester", "Springfield", "Cambridge", "Lowell", "Brockton", "Quincy", "Lynn", "New Bedford", "Fall River"],
+    "Michigan": ["Detroit", "Grand Rapids", "Warren", "Sterling Heights", "Ann Arbor", "Lansing", "Flint", "Dearborn", "Livonia", "Westland"],
+    "Minnesota": ["Minneapolis", "St. Paul", "Rochester", "Duluth", "Bloomington", "Brooklyn Park", "Plymouth", "St. Cloud", "Eagan", "Woodbury"],
+    "Mississippi": ["Jackson", "Gulfport", "Southaven", "Hattiesburg", "Biloxi", "Meridian", "Tupelo", "Greenville", "Olive Branch", "Horn Lake"],
+    "Missouri": ["Kansas City", "St. Louis", "Springfield", "Columbia", "Independence", "Lee's Summit", "O'Fallon", "St. Joseph", "St. Charles", "St. Peters"],
+    "Montana": ["Billings", "Missoula", "Great Falls", "Bozeman", "Butte", "Helena", "Kalispell", "Havre", "Anaconda", "Miles City"],
+    "Nebraska": ["Omaha", "Lincoln", "Bellevue", "Grand Island", "Kearney", "Fremont", "Hastings", "North Platte", "Norfolk", "Columbus"],
+    "Nevada": ["Las Vegas", "Henderson", "Reno", "North Las Vegas", "Sparks", "Carson City", "Fernley", "Elko", "Mesquite", "Boulder City"],
+    "New Hampshire": ["Manchester", "Nashua", "Concord", "Derry", "Dover", "Rochester", "Salem", "Merrimack", "Hudson", "Londonderry"],
+    "New Jersey": ["Newark", "Jersey City", "Paterson", "Elizabeth", "Trenton", "Clifton", "Camden", "Passaic", "Union City", "Bayonne"],
+    "New Mexico": ["Albuquerque", "Las Cruces", "Rio Rancho", "Santa Fe", "Roswell", "Farmington", "Clovis", "Hobbs", "Alamogordo", "Carlsbad"],
+    "New York": ["New York City", "Buffalo", "Rochester", "Yonkers", "Syracuse", "Albany", "New Rochelle", "Mount Vernon", "Schenectady", "Utica"],
+    "North Carolina": ["Charlotte", "Raleigh", "Greensboro", "Durham", "Winston-Salem", "Fayetteville", "Cary", "Wilmington", "High Point", "Concord"],
+    "North Dakota": ["Fargo", "Bismarck", "Grand Forks", "Minot", "West Fargo", "Williston", "Dickinson", "Mandan", "Jamestown", "Wahpeton"],
+    "Ohio": ["Columbus", "Cleveland", "Cincinnati", "Toledo", "Akron", "Dayton", "Parma", "Canton", "Youngstown", "Lorain"],
+    "Oklahoma": ["Oklahoma City", "Tulsa", "Norman", "Broken Arrow", "Lawton", "Edmond", "Moore", "Midwest City", "Enid", "Stillwater"],
+    "Oregon": ["Portland", "Salem", "Eugene", "Gresham", "Hillsboro", "Beaverton", "Bend", "Medford", "Springfield", "Corvallis"],
+    "Pennsylvania": ["Philadelphia", "Pittsburgh", "Allentown", "Erie", "Reading", "Scranton", "Bethlehem", "Lancaster", "Harrisburg", "Altoona"],
+    "Rhode Island": ["Providence", "Warwick", "Cranston", "Pawtucket", "East Providence", "Woonsocket", "Newport", "Central Falls", "Westerly", "North Providence"],
+    "South Carolina": ["Charleston", "Columbia", "North Charleston", "Mount Pleasant", "Rock Hill", "Greenville", "Summerville", "Sumter", "Goose Creek", "Hilton Head Island"],
+    "South Dakota": ["Sioux Falls", "Rapid City", "Aberdeen", "Brookings", "Watertown", "Mitchell", "Yankton", "Pierre", "Huron", "Vermillion"],
+    "Tennessee": ["Nashville", "Memphis", "Knoxville", "Chattanooga", "Clarksville", "Murfreesboro", "Franklin", "Jackson", "Johnson City", "Bartlett"],
+    "Texas": ["Houston", "San Antonio", "Dallas", "Austin", "Fort Worth", "El Paso", "Arlington", "Corpus Christi", "Plano", "Laredo"],
+    "Utah": ["Salt Lake City", "West Valley City", "Provo", "West Jordan", "Orem", "Sandy", "Ogden", "St. George", "Layton", "Taylorsville"],
+    "Vermont": ["Burlington", "South Burlington", "Rutland", "Barre", "Montpelier", "Winooski", "St. Albans", "Newport", "Vergennes", "Middlebury"],
+    "Virginia": ["Virginia Beach", "Norfolk", "Chesapeake", "Richmond", "Newport News", "Alexandria", "Hampton", "Roanoke", "Portsmouth", "Suffolk"],
+    "Washington": ["Seattle", "Spokane", "Tacoma", "Vancouver", "Bellevue", "Kent", "Everett", "Renton", "Yakima", "Federal Way"],
+    "West Virginia": ["Charleston", "Huntington", "Morgantown", "Parkersburg", "Wheeling", "Weirton", "Fairmont", "Beckley", "Martinsburg", "Clarksburg"],
+    "Wisconsin": ["Milwaukee", "Madison", "Green Bay", "Kenosha", "Racine", "Appleton", "Waukesha", "Oshkosh", "Eau Claire", "Janesville"],
+    "Wyoming": ["Cheyenne", "Casper", "Laramie", "Gillette", "Rock Springs", "Sheridan", "Green River", "Evanston", "Riverton", "Jackson"]
 }
 
 def find_lawyers(state, city=None, practice_area=None, pages=1):
@@ -1917,8 +1923,11 @@ if feature == "Legal Chatbot":
 
 elif feature == "Document Analysis":
     st.subheader("Legal Document Analyzer")
-    
-    uploaded_file = st.file_uploader("Upload a legal document (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
+    with st.expander("How to use"):
+        st.write('''upload the file and it will generate analysis of that document.''')
+    st.warning("Do not upload too big files as it might end up consuming all the tokens and the response generation will take too much time")
+    if 'precedents' not in st.session_state:
+        uploaded_file = st.file_uploader("Upload a legal document (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
     
     if uploaded_file and st.button("Analyze Document"):
         with st.spinner("Analyzing document and gathering additional information..."):
@@ -1945,6 +1954,10 @@ elif feature == "Document Analysis":
 
 elif feature == "Case Precedent Finder":
     st.subheader("Case Precedent Finder")
+    
+    with st.expander("How to use"):
+        st.write('''Enter the case details or case name and based on that it will find the cases similar to it.
+Keep the prompt as short as 5 words other wise it might show error in finding case''')
     if 'precedents' not in st.session_state:
         st.session_state.precedents = None
     
