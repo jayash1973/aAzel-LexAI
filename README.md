@@ -18,7 +18,7 @@ LexAI is an AI-powered legal assistant built for the Falcon Hackathon. It levera
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/LexAI.git 
+git clone https://github.com/jayash1973/aAzel-LexAI 
 cd LexAI
 ```
 
