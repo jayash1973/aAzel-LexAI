@@ -48,7 +48,7 @@ except ImportError:
     st.error("Missing dependency: streamlit_lottie. Please install it using 'pip install streamlit-lottie'")
     st.stop()
 
-AI71_API_KEY = "your AI71 Falcon API key"
+AI71_API_KEY = "AI71 Falcon API key"
 
 # Initialize AI71 client
 try:
@@ -237,7 +237,7 @@ def comprehensive_document_analysis(content: str) -> Dict[str, Any]:
         document_analysis = get_ai_response(analysis_prompt)
         
         # Extract main topics or keywords from the document
-        topic_extraction_prompt = f"Extract the main topics or keywords from the following document summary:\n\n{document_analysis}"
+        topic_extraction_prompt = f"Extract the main topic or keyword from the following document summary:\n\n{document_analysis}"
         topics = get_ai_response(topic_extraction_prompt)
         
         web_results = search_web(topics)
@@ -580,13 +580,18 @@ def find_case_precedents(case_details: str) -> Dict[str, Any]:
         compilation_prompt = f"""
         Analyze the following case details and identify key legal concepts and relevant precedents,
         Analyze and the following case law information, focusing solely on factual elements and legal principles. Do not include any speculative or fictional content:
+
         Case Details: {case_details}
+
         Public Case Law Results:
         {format_public_cases(public_cases)}
+
         Web Search Results:
         {format_web_results(web_results)}
+
         Wikipedia Information:
         {wiki_result['summary']}
+
         Provide a well-structured summary highlighting the most relevant precedents and legal principles
         Do not introduce any hypothetical scenarios.
         """
@@ -837,6 +842,7 @@ def analyze_contract(contract_text: str) -> Dict[str, Any]:
         Analyze the following part of the contract ({i+1}/{len(chunks)}), identifying clauses that are favorable and unfavorable to each party involved. 
         Highlight potential areas of concern or clauses that could be exploited. 
         Provide specific examples within this part of the contract to support your analysis.
+
         **Contract Text (Part {i+1}/{len(chunks)}):**
         {chunk}
         """
@@ -1488,7 +1494,7 @@ def generate_legal_brief(case_info):
     full_brief = ""
     
     for i, chunk in enumerate(chunks):
-        prompt = f"""Generate a part of a comprehensive legal brief based on the following information. This is part {i+1} of {len(chunks)}. Focus on:
+        prompt = f"""Generate a part of a comprehensive legal brief based on the following information (generate point 8, 9 10 and 11 only if a case is provided where outcome is yet to come). This is part {i+1} of {len(chunks)}. Focus on:
         1. A summary of the facts
         2. Identification of key legal issues
         3. Relevant laws and precedents
@@ -1496,14 +1502,14 @@ def generate_legal_brief(case_info):
         5. Conclusion and recommendations
         6. An analysis of why the winning party won
         7. A review of how the losing party could have potentially won
-        And if the user has just provided the case information or details of an case which has not been presented in the court or its outcome(result) is yet to come then generate:
-        1. A summary of the facts and the case details.
-        2. How the user can win this case based on the provided information.
-        3. Key areas where user should be carefull and could potentially loose this case.
-        4. Relevant Arguments for this case to be provided in the court.
-        5. predict wheter user can win this case or not.
+        8. How the user can win this case based on the provided information.
+        9. Key areas where user should be carefull and could potentially loose this case.
+        10. Relevant Arguments for this case to be provided in the court.
+        11. predict wheter user can win this case or not.
+
         Case Information (Part {i+1}/{len(chunks)}):
         {chunk}
+
         Please provide a detailed and thorough response for the relevant sections based on this part of the information."""
 
         try:
@@ -1521,7 +1527,8 @@ def generate_legal_brief(case_info):
 
 def automated_legal_brief_generation_ui():
     st.title("Automated Legal Brief Generation")
-    st.subheader("enter the caase details to generate a legal brief or to generate legal brief or predict the case outcome and how the case should proceed")
+    with st.expander("How to use"):
+        st.write('''Enter the case details and based on that it will generate a legal brief and also provide you with the proper analysis of the case and how you can win this case and where you have to be carefull''')
     if 'legal_brief' not in st.session_state:
         st.session_state.legal_brief = ""
 
@@ -1751,7 +1758,7 @@ def lawyer_finder_ui():
         st.warning("Please select a city to continue.")
         return
     
-    pages = st.slider("Number of pages to scrape", 1, 20, 1)
+    pages = st.slider("Number of pages", 1, 20, 1)
     
     if st.button("Find Lawyers", type="primary"):
         with st.spinner("Searching for lawyers in your area..."):
@@ -1798,7 +1805,7 @@ def lawyer_finder_ui():
             else:
                 st.warning(f"No lawyers found in {city}, {state}. Try selecting a different city or state.")
 
-# --- Streamlit App ---
+# Streamlit App 
 st.markdown("""
 <style>
     .reportview-container {
@@ -1938,7 +1945,6 @@ elif feature == "Document Analysis":
 
 elif feature == "Case Precedent Finder":
     st.subheader("Case Precedent Finder")
-    
     if 'precedents' not in st.session_state:
         st.session_state.precedents = None
     
