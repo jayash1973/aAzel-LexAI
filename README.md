@@ -53,6 +53,12 @@ Open your web browser and navigate to `http://localhost:8501` to start using Lex
 
 ## Contribution
 Contributions to LexAI are encouraged! Fork the repository, create a new branch, make your changes, and submit a pull request.
+### Contributor - Yoon Thiri Aung** 
+
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-black?style=for-the-badge&logo=github)](https://github.com/yoon-thiri04)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/yoon-thiri-aung-497a6929a)
+
+
 
 ## License
 
