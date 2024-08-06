@@ -48,7 +48,7 @@ except ImportError:
     st.error("Missing dependency: streamlit_lottie. Please install it using 'pip install streamlit-lottie'")
     st.stop()
 
-AI71_API_KEY = "AI71 falcon apikey"
+AI71_API_KEY = "your AI71 Falcon API key"
 
 # Initialize AI71 client
 try:
@@ -96,7 +96,7 @@ def get_document_based_response(prompt, document_content):
 def get_ai_response(prompt: str) -> str:
     """Gets the AI response based on the given prompt."""
     messages = [
-        {"role": "system", "content": "You are a helpful legal assistant with advanced capabilities."},
+        {"role": "system", "content": "You are a helpful legal assistant LexAI which has all the legal information in the world and is the the best assitand for lawyers, lawfirms and a common citizen, answer the question based on the US law but if the question lies out of the context of us law then answer it too saying i am LexAI and advanced legal assistant but this is what i know about the topic you are asking"},
         {"role": "user", "content": prompt}
     ]
     try:
@@ -580,18 +580,13 @@ def find_case_precedents(case_details: str) -> Dict[str, Any]:
         compilation_prompt = f"""
         Analyze the following case details and identify key legal concepts and relevant precedents,
         Analyze and the following case law information, focusing solely on factual elements and legal principles. Do not include any speculative or fictional content:
-
         Case Details: {case_details}
-
         Public Case Law Results:
         {format_public_cases(public_cases)}
-
         Web Search Results:
         {format_web_results(web_results)}
-
         Wikipedia Information:
         {wiki_result['summary']}
-
         Provide a well-structured summary highlighting the most relevant precedents and legal principles
         Do not introduce any hypothetical scenarios.
         """
@@ -842,7 +837,6 @@ def analyze_contract(contract_text: str) -> Dict[str, Any]:
         Analyze the following part of the contract ({i+1}/{len(chunks)}), identifying clauses that are favorable and unfavorable to each party involved. 
         Highlight potential areas of concern or clauses that could be exploited. 
         Provide specific examples within this part of the contract to support your analysis.
-
         **Contract Text (Part {i+1}/{len(chunks)}):**
         {chunk}
         """
@@ -1502,10 +1496,14 @@ def generate_legal_brief(case_info):
         5. Conclusion and recommendations
         6. An analysis of why the winning party won
         7. A review of how the losing party could have potentially won
-
+        And if the user has just provided the case information or details of an case which has not been presented in the court or its outcome(result) is yet to come then generate:
+        1. A summary of the facts and the case details.
+        2. How the user can win this case based on the provided information.
+        3. Key areas where user should be carefull and could potentially loose this case.
+        4. Relevant Arguments for this case to be provided in the court.
+        5. predict wheter user can win this case or not.
         Case Information (Part {i+1}/{len(chunks)}):
         {chunk}
-
         Please provide a detailed and thorough response for the relevant sections based on this part of the information."""
 
         try:
@@ -1523,7 +1521,7 @@ def generate_legal_brief(case_info):
 
 def automated_legal_brief_generation_ui():
     st.title("Automated Legal Brief Generation")
-
+    st.subheader("enter the caase details to generate a legal brief or to generate legal brief or predict the case outcome and how the case should proceed")
     if 'legal_brief' not in st.session_state:
         st.session_state.legal_brief = ""
 
@@ -1556,6 +1554,23 @@ def automated_legal_brief_generation_ui():
             file_name="legal_brief.txt",
             mime="text/plain"
         )
+
+PRACTICE_AREAS = [
+    "Personal Injury", "Medical Malpractice", "Criminal Law", "DUI & DWI", "Family Law",
+    "Divorce", "Bankruptcy", "Business Law", "Consumer Law", "Employment Law",
+    "Estate Planning", "Foreclosure Defense", "Immigration Law", "Intellectual Property",
+    "Nursing Home Abuse", "Probate", "Products Liability", "Real Estate Law", "Tax Law",
+    "Traffic Tickets", "Workers' Compensation", "Agricultural Law", "Animal & Dog Law",
+    "Antitrust Law", "Appeals & Appellate", "Arbitration & Mediation", "Asbestos & Mesothelioma",
+    "Cannabis & Marijuana Law", "Civil Rights", "Collections", "Communications & Internet Law",
+    "Construction Law", "Domestic Violence", "Education Law", "Elder Law",
+    "Energy, Oil & Gas Law", "Entertainment & Sports Law", "Environmental Law",
+    "Gov & Administrative Law", "Health Care Law", "Insurance Claims", "Insurance Defense",
+    "International Law", "Juvenile Law", "Landlord Tenant", "Legal Malpractice",
+    "Maritime Law", "Military Law", "Municipal Law", "Native American Law", "Patents",
+    "Securities Law", "Social Security Disability", "Stockbroker & Investment Fraud",
+    "Trademarks", "White Collar Crime"
+]
 
 STATES = [
     "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
@@ -1618,9 +1633,17 @@ CITIES_BY_STATE = {
     "Wyoming": ["Cheyenne", "Casper", "Laramie"]
 }
 
-def find_lawyers(state, city, pages=1):
+def find_lawyers(state, city=None, practice_area=None, pages=1):
     base_url = "https://www.justia.com/lawyers/"
-    url = f"{base_url}{state.lower()}/{city.lower().replace(' ', '-')}"
+    url = base_url
+    
+    if practice_area:
+        url += f"{practice_area.lower().replace(' ', '-').replace('&', '-')}/"
+    
+    url += state.lower()
+    
+    if city:
+        url += f"/{city.lower().replace(' ', '-')}"
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -1713,13 +1736,16 @@ def find_lawyers(state, city, pages=1):
 def lawyer_finder_ui():
     st.title("Find Lawyers in Your Area")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         state = st.selectbox("Select a State:", STATES)
     
     with col2:
         cities = CITIES_BY_STATE.get(state, [])
         city = st.selectbox("Select a City:", cities)
+    
+    with col3:
+        practice_area = st.selectbox("Select a Practice Area:", [""] + PRACTICE_AREAS)
     
     if not city:
         st.warning("Please select a city to continue.")
@@ -1729,7 +1755,7 @@ def lawyer_finder_ui():
     
     if st.button("Find Lawyers", type="primary"):
         with st.spinner("Searching for lawyers in your area..."):
-            df_lawyers = find_lawyers(state, city, pages)
+            df_lawyers = find_lawyers(state, city, practice_area, pages)
             
             if not df_lawyers.empty:
                 st.success(f"Found {len(df_lawyers)} lawyers in {city}, {state}.")
