@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lex AI - Revolutionizing Legal Technology</title>
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .hero {
+            background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://images.unsplash.com/photo-1505664194779-8beaceb93744?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-gray-900 text-white sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <nav class="flex items-center justify-between flex-wrap">
+                <div class="flex items-center flex-shrink-0 mr-6">
+                    <a href="#" class="text-2xl font-bold">Lex AI</a>
+                </div>
+                
+                <div class="block lg:hidden">
+                    <button id="mobile-menu-button" class="flex items-center px-3 py-2 border rounded text-gray-200 border-gray-400 hover:text-white hover:border-white">
+                        <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <title>Menu</title>
+                            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="menu" class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden">
+                    <div class="text-sm lg:flex-grow">
+                        <a href="#about" class="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4">
+                            About
+                        </a>
+                        <a href="#features" class="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4">
+                            Features
+                        </a>
+                        <a href="#pricing" class="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4">
+                            Pricing
+                        </a>
+                        <a href="#market" class="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4">
+                            Market Opportunity
+                        </a>
+                        <a href="#contact" class="block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white">
+                            Contact
+                        </a>
+                    </div>
+                    <div>
+                        <a href="https://huggingface.co/spaces/Johan713/aAzelll" class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-900 hover:bg-white mt-4 lg:mt-0">GET STARTED</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero text-white py-32">
+            <div class="container mx-auto text-center px-6">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6">Revolutionizing Legal Technology</h1>
+                <p class="text-xl mb-12">Empower your legal practice with AI-driven solutions</p>
+                <a href="https://huggingface.co/spaces/Johan713/aAzelll" class="bg-blue-600 text-white py-3 px-8 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300">Get Started</a>
+            </div>
+        </section>
+
+        <section id="pricing" class="bg-gray-100 py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Pricing Plans</h2>
+                <div class="flex flex-col space-y-8 max-w-4xl mx-auto">
+                    <div class="pricing-card bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-4">Individual</h3>
+                        <p class="text-4xl font-bold mb-6">$14.99<span class="text-lg font-normal">/month</span></p>
+                        <ul class="mb-8 space-y-2">
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Basic Chatbot</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Contract and Document Analysis</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Legal Cost Estimator</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Find a Lawyer</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 5 million tokens for Falcon 180B</li>
+                        </ul>
+                        <a href="#" class="block text-center bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300">Choose Plan</a>
+                    </div>
+                    <div class="pricing-card bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-4">Small Enterprise</h3>
+                        <p class="text-4xl font-bold mb-6">$149.99<span class="text-lg font-normal">/month</span></p>
+                        <ul class="mb-8 space-y-2">
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Advanced Legal Chatbot (Assistant)</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Document Analysis</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Case Precedent Finder</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Legal Cost Estimator</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Contract Analysis</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Case Trend Visualizer</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Case Information Retrieval</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Automated Legal Brief Generation</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Find a Lawyer</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Policy Analysis and Impact</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Contract Drafting Assistant</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Predictive Case Analysis</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 50 million tokens for Falcon 180B</li>
+                        </ul>
+                        <a href="#" class="block text-center bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300">Choose Plan</a>
+                    </div>
+                    <div class="pricing-card bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-4">Large Enterprise</h3>
+                        <p class="text-4xl font-bold mb-6">Contact Sales</p>
+                        <ul class="mb-8 space-y-2">
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> All Small Enterprise Features</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited tokens for Falcon 180B</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Custom Integration</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Dedicated Support</li>
+                        </ul>
+                        <a href="#contact" class="block text-center bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Lex AI's Features</h2>
+                <div class="space-y-20">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Advanced Legal Chatbot (Assistant)</h3>
+                            <p>Our AI-powered legal assistant provides instant answers to complex legal queries, helping lawyers and legal professionals save time and improve efficiency. It's trained on vast legal databases and can provide accurate information on case law, statutes, and legal procedures.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="AI Chatbot" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Document Analysis</h3>
+                            <p>Quickly analyze and extract key information from legal documents, contracts, and case files using our advanced AI algorithms, significantly reducing manual review time. Our system can identify important clauses, potential risks, and inconsistencies across multiple documents.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Document Analysis" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Case Precedent Finder</h3>
+                            <p>Our AI scans vast databases of legal cases to find relevant precedents, helping lawyers build stronger arguments and save hours of research time. It can identify similar cases based on multiple factors and provide summaries of key rulings.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1589391886645-d51941baf7fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Case Precedent Finder" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Legal Cost Estimator</h3>
+                            <p>Accurately estimate legal costs for clients based on case complexity, duration, and required resources, improving transparency and client satisfaction. Our tool considers historical data and current market rates to provide reliable estimates.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Legal Cost Estimator" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Contract Analysis</h3>
+                            <p>Our AI-powered contract analysis tool quickly reviews and extracts key information from various types of contracts. It identifies potential risks, non-standard clauses, and ensures compliance with relevant laws and regulations.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Contract Analysis" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Case Trend Visualizer</h3>
+                            <p>Visualize trends in case outcomes, judge rulings, and legal precedents over time. This powerful tool helps lawyers identify patterns and make data-driven decisions in their case strategies.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Case Trend Visualizer" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Case Information Retrieval</h3>
+                            <p>Quickly retrieve relevant information from vast case databases using natural language queries. Our system understands context and can provide summaries, key points, and direct citations from relevant cases.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1423592707957-3b212afa6733?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Case Information Retrieval" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Automated Legal Brief Generation</h3>
+                            <p>Generate initial drafts of legal briefs based on case details, relevant precedents, and key arguments. This tool significantly reduces the time spent on preliminary drafting, allowing lawyers to focus on refining and perfecting their arguments.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Automated Legal Brief Generation" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Find a Lawyer</h3>
+                            <p>Our intelligent lawyer matching system helps clients find the most suitable legal representation based on their specific needs, case type, and location. It considers factors such as expertise, experience, and past case outcomes.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Find a Lawyer" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Policy Analysis and Impact</h3>
+                            <p>Analyze the potential impact of new laws and policies on various stakeholders. This tool helps legal professionals and policymakers understand the broader implications of legal changes and make informed decisions.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1436450412740-6b988f486c6b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Policy Analysis and Impact" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                            <h3 class="text-2xl font-semibold mb-4">Contract Drafting Assistant</h3>
+                            <p>Our AI-powered contract drafting assistant helps lawyers create robust, tailored contracts efficiently. It suggests relevant clauses, identifies potential omissions, and ensures compliance with current laws and regulations.</p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Contract Drafting Assistant" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row-reverse items-center">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pl-8">
+                            <h3 class="text-2xl font-semibold mb-4">Predictive Case Analysis</h3>
+                            <p>Leverage machine learning algorithms to predict potential case outcomes based on historical data, judge tendencies, and case specifics. This tool helps lawyers develop more effective strategies and set realistic expectations for their clients.</p>
+                        </div>
+                            <div class="md:w-1/2">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Predictive Case Analysis" class="rounded-lg shadow-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market" class="bg-gray-100 py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Market Opportunity</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4">Total Addressable Market (TAM)</h3>
+                        <p class="mb-4">The global legal technology market is projected to grow from $29.19 billion in 2021 to $78.12 billion by 2028, with a CAGR of 14.8%.</p>
+                        <div id="tam-graph"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4">Serviceable Addressable Market (SAM)</h3>
+                        <p class="mb-4">Lex AI targets law firms and corporate legal departments. The global legal services market was valued at $849 billion in 2020 and is expected to reach $1.1 trillion by 2026, with a CAGR of 4.4%.</p>
+                        <div id="sam-graph"></div>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-2xl font-semibold mb-4">Lex AI's Position</h3>
+                    <p>Lex AI's tools for legal document analysis, case precedent research, and information summarization position it well to capture a significant portion of this growing market. By offering a compelling value proposition and continuous innovation, Lex AI can establish itself as a leading player in legal technology.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">Contact Sales</h2>
+                <form class="max-w-lg mx-auto">
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
+                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="business" class="block text-gray-700 font-bold mb-2">Business Name</label>
+                        <input type="text" id="business" name="business" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="phone" class="block text-gray-700 font-bold mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="profession" class="block text-gray-700 font-bold mb-2">Profession</label>
+                        <input type="text" id="profession" name="profession" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
+                        <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox" required>
+                            <span class="ml-2">I consent to having my information sent to jayashbhardwaj3@gmail.com</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Submit</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Lex AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // TAM Graph
+        var tamData = [
+            {year: 2021, value: 29.19},
+            {year: 2028, value: 78.12}
+        ];
+
+        var tamLayout = {
+            title: 'Global Legal Technology Market Growth',
+            xaxis: {title: 'Year'},
+            yaxis: {title: 'Market Size (Billion USD)'}
+        };
+
+        Plotly.newPlot('tam-graph', [{
+            x: tamData.map(d => d.year),
+            y: tamData.map(d => d.value),
+            type: 'scatter',
+            mode: 'lines+markers'
+        }], tamLayout);
+
+        // SAM Graph
+        var samData = [
+            {year: 2020, value: 849},
+            {year: 2026, value: 1100}
+        ];
+
+        var samLayout = {
+            title: 'Global Legal Services Market Growth',
+            xaxis: {title: 'Year'},
+            yaxis: {title: 'Market Size (Billion USD)'}
+        };
+
+        Plotly.newPlot('sam-graph', [{
+            x: samData.map(d => d.year),
+            y: samData.map(d => d.value),
+            type: 'scatter',
+            mode: 'lines+markers'
+        }], samLayout);
+    </script>
+</body>
+</html>
