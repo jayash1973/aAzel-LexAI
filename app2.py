@@ -48,7 +48,7 @@ except ImportError:
     st.error("Missing dependency: streamlit_lottie. Please install it using 'pip install streamlit-lottie'")
     st.stop()
 
-AI71_API_KEY = "AI71 Falcon API Key"
+AI71_API_KEY = "AI71 Falcon API key"
 
 # Initialize AI71 client
 try:
@@ -1811,6 +1811,246 @@ def lawyer_finder_ui():
             else:
                 st.warning(f"No lawyers found in {city}, {state}. Try selecting a different city or state.")
 
+def analyze_policy(policy_text: str) -> Dict[str, Any]:
+    chunks = split_text(policy_text)
+    full_analysis = ""
+
+    for i, chunk in enumerate(chunks):
+        analysis_prompt = f"""
+        Analyze the following part of the policy text ({i+1}/{len(chunks)}), taking into account US legal and societal contexts:
+
+        Policy Text (Part {i+1}/{len(chunks)}):
+        ```
+        {chunk}
+        ```
+
+        Provide a comprehensive analysis that includes:
+        * **Summary:** Briefly summarize the key points of the policy.
+        * **Large-Scale Impact:** Discuss the potential impact of this policy on a national or state level. Consider economic, social, and legal implications.
+        * **Small-Scale Impact:** Analyze how this policy might affect individuals, families, or specific communities within the US.
+        * **Long-Term Benefits:** What are the potential advantages of this policy in the long run (5-10 years or more)? 
+        * **Short-Term Benefits:** What benefits might be observed within the first few years of implementing this policy?
+        * **Potential Drawbacks:** Are there any possible negative consequences or challenges in implementing this policy?
+        * **Legal Considerations:**  Are there any existing US laws or regulations that this policy might conflict with or be affected by?
+        * **Historical Context:** Are there any historical parallels or past US policies that might inform the potential outcomes of this policy?
+        * **Suggestions for Improvement:**  Offer specific recommendations on how the policy could be modified to enhance its effectiveness or mitigate potential drawbacks.
+        * **Stakeholder Perspectives:** Identify different groups or entities in the US that might have an interest in this policy (e.g., businesses, consumers, government agencies), and how they might view it.
+        Support your analysis with relevant examples, statistics, or legal precedents from the US, where applicable. 
+        Maintain a neutral and objective tone, presenting both potential advantages and disadvantages of the policy.
+        """
+
+        try:
+            chunk_analysis = get_ai_response(analysis_prompt)
+            full_analysis += chunk_analysis + "\n\n"
+        except Exception as e:
+            return {"error": f"Error analyzing part {i+1} of the policy text: {str(e)}"}
+
+    return {"analysis": full_analysis}
+
+def policy_analysis_ui():
+    st.subheader("Policy Analysis & Impact")
+    st.write('''
+    Enter the US policy text you want to analyze or upload a document. 
+    LexAI will provide a comprehensive analysis of the policy's potential impact, benefits, drawbacks, and more.
+    ''')
+    
+    st.warning("Please do not upload files larger than 5MB as it may cause issues and consume all available tokens.")
+
+    input_method = st.radio("Choose input method:", ("Text Input", "Document Upload"))
+    
+    policy_text = ""
+    if input_method == "Text Input":
+        policy_text = st.text_area("Enter the US policy text:", height=200)
+    else:
+        uploaded_file = st.file_uploader("Upload a document containing policy text (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
+        if uploaded_file is not None:
+            policy_text = extract_text_from_document(uploaded_file)
+
+    if st.button("Analyze Policy"):
+        if policy_text:
+            with st.spinner("Analyzing policy..."):
+                analysis_results = analyze_policy(policy_text)
+
+                if "error" in analysis_results:
+                    st.error(analysis_results["error"])
+                else:
+                    analysis = analysis_results.get("analysis", "No analysis available.")
+                    st.write("### Policy Analysis")
+                    st.write(analysis)
+
+                    # Download button
+                    st.download_button(
+                        label="Download Complete Analysis",
+                        data=analysis,
+                        file_name="policy_analysis.txt",
+                        mime="text/plain"
+                    )
+        else:
+            st.warning("Please enter policy text or upload a document to analyze.")
+
+def draft_contract(contract_details: str) -> Dict[str, Any]:
+    chunks = split_text(contract_details)
+    full_draft = ""
+
+    for i, chunk in enumerate(chunks):
+        drafting_prompt = f"""
+        Draft a legally sound and comprehensive contract based on the following details (part {i+1}/{len(chunks)}), ensuring compliance with US law.
+
+        Contract Details (Part {i+1}/{len(chunks)}):
+        ```
+        {chunk}
+        ```
+
+        Output Format:
+        Present the drafted contract in a clear and organized manner, using sections and headings. 
+        Include the following essential clauses (and any others relevant to the provided details):
+        * Parties: Clearly identify the names and addresses of all parties entering into the contract.
+        * Term and Termination: Specify the duration of the contract and conditions for renewal or termination.
+        * Payment Terms: Outline payment details, including amounts, schedule, and methods. 
+        * Governing Law: State that the contract shall be governed by the laws of the state specified in the details.
+        * Dispute Resolution: Include a clause outlining how disputes will be handled (e.g., mediation, arbitration).
+        * Entire Agreement: State that the written contract represents the entire agreement between the parties.
+        * Signatures: Leave space for the dated signatures of all parties involved.
+        """
+
+        try:
+            chunk_draft = get_ai_response(drafting_prompt)
+            full_draft += chunk_draft + "\n\n"
+
+        except Exception as e:
+            return {"error": f"Error drafting contract (part {i+1}): {str(e)}"}
+
+    return {"draft": full_draft}
+
+def contract_drafting_ui():
+    st.subheader("Contract Drafting Assistant")
+    st.write('''
+    Provide details about the contract you need drafted, including:
+
+    * Parties: Names and addresses of all parties.
+    * Subject Matter: Clearly describe the goods, services, or purpose of the contract.
+    * Key Terms: Specify payment amounts, deadlines, delivery terms, or other crucial details.
+    * Governing Law: State the US state whose laws will govern the contract.
+    * Additional Provisions: Include any specific clauses, conditions, or requirements.
+
+    Be as clear and thorough as possible to ensure the drafted contract meets your needs. 
+    ''')
+
+    st.warning("Please do not upload files larger than 5MB as it may cause issues and consume all available tokens.")
+
+    input_method = st.radio("Choose input method:", ("Text Input", "Document Upload"))
+    
+    contract_details = ""
+    if input_method == "Text Input":
+        contract_details = st.text_area("Enter contract details:", height=200)
+    else:
+        uploaded_file = st.file_uploader("Upload a document containing contract details (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
+        if uploaded_file is not None:
+            contract_details = extract_text_from_document(uploaded_file)
+
+    if st.button("Draft Contract"):
+        if contract_details:
+            with st.spinner("Drafting your contract..."):
+                draft_results = draft_contract(contract_details)
+
+            if "error" in draft_results:
+                st.error(draft_results["error"])
+            else:
+                st.write("### Drafted Contract")
+                contract_draft = draft_results.get("draft", "No draft available.")
+                st.write(contract_draft) 
+
+                st.download_button(
+                    label="Download Contract",
+                    data=contract_draft,
+                    file_name="drafted_contract.txt",
+                    mime="text/plain"
+                )
+
+        else:
+            st.warning("Please enter contract details or upload a document to proceed.")
+
+def analyze_case_for_prediction(case_details: str) -> Dict[str, Any]:
+    chunks = split_text(case_details)
+    full_analysis = ""
+
+    for i, chunk in enumerate(chunks):
+        analysis_prompt = f"""
+        Analyze the following case details (part {i+1}/{len(chunks)}) in the context of the US legal system and provide a predictive analysis.
+
+        Case Details (Part {i+1}/{len(chunks)}):
+        ```
+        {chunk}
+        ```
+
+        Your analysis should address the following:
+        * **Case Summary:** Briefly summarize the key facts, legal claims, and parties involved in the case.
+        * **Predicted Outcome:** What is the most likely outcome of this case based on the provided information, US legal precedents, and similar cases? Explain your reasoning.
+        * **Strengths of the Case:**  Identify the most compelling arguments and evidence that support a favorable outcome. 
+        * **Weaknesses of the Case:**  What are potential weaknesses in the case, or areas where the opposing party might have strong arguments? 
+        * **Areas of Caution:**  What potential pitfalls or challenges should be considered? What strategies could the opposing party use? 
+        * **Relevant US Case Law:** Cite specific US legal precedents and similar cases that support your analysis and predicted outcome. 
+        * **Recommended Strategies:** Offer specific, actionable recommendations on how to strengthen the case and increase the likelihood of a positive result. 
+
+        Please maintain a neutral and objective tone throughout your analysis. The goal is to provide a realistic assessment of the case, not to advocate for a particular side. 
+        """
+
+        try:
+            chunk_analysis = get_ai_response(analysis_prompt)
+            full_analysis += chunk_analysis + "\n\n"
+
+        except Exception as e:
+            return {"error": f"Error analyzing case (part {i+1}): {str(e)}"}
+
+    return {"analysis": full_analysis}
+
+def predictive_analysis_ui():
+    st.subheader("Predictive Case Analysis")
+    st.write('''
+    Enter the details of your case, including:
+
+    * Facts: Briefly describe the key events that led to the legal dispute. 
+    * Legal Issues: State the specific legal questions or claims in the case.
+    * Relevant Law: Identify any relevant US laws, statutes, or regulations.
+    * Jurisdiction: Specify the US state where the case is filed.
+
+    LexAI will provide a predictive analysis, outlining potential outcomes, strengths and weaknesses of the case, and relevant US case law.
+    ''')
+
+    st.warning("Please do not upload files larger than 5MB as it may cause issues and consume all available tokens.")
+
+    input_method = st.radio("Choose input method:", ("Text Input", "Document Upload"))
+    
+    case_details = ""
+    if input_method == "Text Input":
+        case_details = st.text_area("Enter case details:", height=200)
+    else:
+        uploaded_file = st.file_uploader("Upload a document containing case details (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
+        if uploaded_file is not None:
+            case_details = extract_text_from_document(uploaded_file)
+
+    if st.button("Analyze Case"):
+        if case_details:
+            with st.spinner("Analyzing your case..."):
+                analysis_results = analyze_case_for_prediction(case_details)
+
+            st.write("### Case Analysis")
+            if "error" in analysis_results:
+                st.error(analysis_results["error"])
+            else:
+                analysis = analysis_results.get("analysis", "No analysis available.")
+                st.write(analysis)
+
+                # Download button for analysis
+                st.download_button(
+                    label="Download Analysis",
+                    data=analysis,
+                    file_name="case_analysis.txt",
+                    mime="text/plain"
+                )
+        else:
+            st.warning("Please enter case details or upload a document to analyze.")
+
 # Streamlit App 
 st.markdown("""
 <style>
@@ -1863,7 +2103,7 @@ with st.sidebar:
     
     feature = st.selectbox(
         "Select a feature",
-        ["Legal Chatbot", "Document Analysis", "Case Precedent Finder", "Legal Cost Estimator", "Contract Analysis", "Case Trend Visualizer", "Case Information Retrieval", "Automated Legal Brief Generation", "Find the Lawyers"]
+        ["Legal Chatbot", "Document Analysis", "Case Precedent Finder", "Legal Cost Estimator", "Contract Analysis", "Case Trend Visualizer", "Case Information Retrieval", "Automated Legal Brief Generation", "Find the Lawyers", "Policy Analysis & Impact", "Contract Drafting Assistant", "Predictive Case Analysis"]
     )
 if feature == "Legal Chatbot":
     st.subheader("Legal Chatbot")
@@ -2034,11 +2274,19 @@ elif feature == "Automated Legal Brief Generation":
 elif feature == "Find the Lawyers":
     lawyer_finder_ui()
 
+elif feature == "Policy Analysis & Impact":
+    policy_analysis_ui()
+    
+elif feature == "Contract Drafting Assistant":
+    contract_drafting_ui()
+    
+elif feature == "Predictive Case Analysis":
+    predictive_analysis_ui()
 st.markdown("---")
 st.markdown(
     """
     <div style="text-align: center;">
-        <p>© 2023 Lex AI. All rights reserved.</p>
+        <p>© 2024 Lex AI. All rights reserved.</p>
         <p><small>Disclaimer: This tool provides general legal information and assistance. It is not a substitute for professional legal advice. Please consult with a qualified attorney for specific legal matters.</small></p>
     </div>
     """,
