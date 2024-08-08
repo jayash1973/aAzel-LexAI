@@ -12,6 +12,10 @@ LexAI is an AI-powered legal assistant built for the Falcon Hackathon. It levera
 - **Case Trend Visualizer:** Explore visualizations of historical legal case data to gain insights into trends and patterns.
 - **Web and Wikipedia Search Integration:**  LexAI seamlessly integrates information from trusted online sources to provide comprehensive legal insights.
 - **User-Friendly Interface:**  Easy-to-use design makes navigating LexAI intuitive, even for those without extensive legal background.
+- **Find the Lawyer:**  Finds the lawyers in you r city based on you r preference.
+- **Policy Impact & Analysis**  generates a proper deep analyisis of the policy and also suggests the ways to improve the policy.
+- **Advanced Contract drafting**  Drafts the contract for the user based on the contract details using Falcon 2 180 B.
+- **Predictive Case Analysis**  Uses the advanced Falcon 180 B llm to predict the case results and how you can turn the tides in your favour to help you win this case.
 
 ## Getting Started
 
@@ -53,7 +57,13 @@ Open your web browser and navigate to `http://localhost:8501` to start using Lex
 
 ## Contribution
 Contributions to LexAI are encouraged! Fork the repository, create a new branch, make your changes, and submit a pull request.
-### Contributor - Yoon Thiri Aung** 
+
+### Project Lead - Jayash Bharwdaj (backend and frontend developer)**
+
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-black?style=for-the-badge&logo=github)](https://github.com/jayash1973)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/jayash-bhardwaj)
+
+### Contributor - Yoon Thiri Aung (Power Point Editor)** 
 
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-black?style=for-the-badge&logo=github)](https://github.com/yoon-thiri04)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/yoon-thiri-aung-497a6929a)
